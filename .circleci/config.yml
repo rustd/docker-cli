@@ -1,9 +1,20 @@
-version: 2
+version: 2.1
 
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  cross:
+  say-hello:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    docker:
+      - image: cimg/base:stable
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
       - run: apk add make curl
       - run: mkdir -vp ~/.docker/cli-plugins/
       - run: curl -fsSL --output ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64
@@ -12,8 +23,9 @@ jobs:
       - run: docker context create buildctx
       - run: docker buildx create --use buildctx && docker buildx inspect --bootstrap
 
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  version: 2
-  ci:
+  say-hello-workflow:
     jobs:
-      - cross
+      - say-hello
